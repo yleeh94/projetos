@@ -30,7 +30,7 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 
-secrets = st.secrets
+secrets = st.secrets["secrets"]
 
 CLIENT_ID = secrets["CLIENT_ID"]
 CLIENT_SECRET = secrets["CLIENT_SECRET"]
@@ -244,11 +244,9 @@ SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 
 def obter_credenciais():
     creds = None
-    if st.file_uploader("token.json") == None:
+    if st.file_uploader("token.json") is None:
         st.warning("Arquivo de credencial não encontrado!")
-        flow = InstalledAppFlow.from_client_secrets_file(
-            "client_secret.json", SCOPES
-        )
+        flow = InstalledAppFlow.from_client_secrets_file("client_secret.json", SCOPES)
         creds = flow.run_local_server(port=0)
         # Salvar as credenciais para uso posterior
         with open("token.json", "w") as token:
@@ -257,10 +255,10 @@ def obter_credenciais():
         creds = Credentials.from_authorized_user_file("token.json", SCOPES)
 
     return creds
+
 def logar_HC(user_name):
     creds = obter_credenciais()
     service = build("sheets", "v4", credentials=creds)
-    sheet = build('sheets', 'v4', credentials=creds)
 
     # Substitua 'client' pela variável correta
     result = service.spreadsheets().values().get(spreadsheetId='1gP0vFS3GfSgVBiQncFECMxgWjENhVQN6TPUmPs_w78U', range="BASE").execute()
