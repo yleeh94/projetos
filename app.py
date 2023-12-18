@@ -242,14 +242,27 @@ SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 }
 
 
+
 def obter_credenciais():
-    creds = Credentials.from_authorized_user_info(
-    {
-        "client_id": secrets["CLIENT_ID"],
-        "client_secret": secrets["CLIENT_SECRET"],
-        "scopes": SCOPES})
-    
+    creds = st.session_state.creds if "creds" in st.session_state else None
+
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            creds = obter_credenciais_interativo()
+
+        st.session_state.creds = creds
+
     return creds
+
+def obter_credenciais_interativo():
+    flow = InstalledAppFlow.from_client_secrets_file(
+        "client_secret.json", SCOPES
+    )
+    creds = flow.run_local_server(port=0)
+    return creds
+
 
 def logar_HC(user_name):
     creds = obter_credenciais()
