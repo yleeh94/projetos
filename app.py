@@ -8,68 +8,6 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 
-def fazer_login_navegador(navegador, usuario, senha):
-    try:
-        campo_user = WebDriverWait(navegador, 10).until(
-            EC.element_to_be_clickable((By.XPATH, '//*[@id="auth0-lock-container-1"]/div/div[2]/form/div/div/div/div[1]/div[2]/div[2]/span/div/div/div/div/div/div/div/div/div[1]/div/input')))
-        campo_user.send_keys(usuario)
-        campo_senha = WebDriverWait(navegador, 10).until(
-            EC.element_to_be_clickable((By.XPATH, '//*[@id="1-password"]')))
-        campo_senha.send_keys(senha)
-    except TimeoutException:
-        print("Tempo de conexão excedido ao tentar fazer login no WMS. Verifique sua conexão e tente novamente.")
-        raise
-
-def login_semanal():
-    # Verificar se as credenciais já foram salvas anteriormente
-    if os.path.exists("credenciais.pkl"):
-        with open("credenciais.pkl", "rb") as file:
-            credenciais_salvas = pickle.load(file)
-
-            # Verifica se as credenciais salvas não estão em branco
-            if not credenciais_salvas["usuario"].strip() or not credenciais_salvas["senha"].strip() or not credenciais_salvas["email"].strip():
-                print("Credenciais salvas em branco. Por favor, insira suas credenciais novamente.")
-                usuario_meli = input("Digite seu usuário: ")
-                senha_meli = getpass.getpass("Digite sua senha: ")
-                email_meli = input("Digite seu e-mail: ")
-
-            else:
-                # Credenciais salvas não estão em branco
-                usuario_meli = credenciais_salvas["usuario"]
-                senha_meli = credenciais_salvas["senha"]
-                email_meli = credenciais_salvas["email"]
-
-                # Verificar se já se passou uma semana desde a última solicitação
-                expiracao_login = (datetime.datetime.now() - credenciais_salvas["timestamp"]).days >= 15
-                if not expiracao_login:
-                    print("Credenciais encontradas, logando.")
-                    return credenciais_salvas
-
-    # Se as credenciais não foram salvas ou se passou 2 semanas, solicitar novamente
-    usuario_meli = input("Digite seu usuário: ")
-    senha_meli = getpass.getpass("Digite sua senha: ")
-    email_meli = input("Digite seu e-mail: ")
-
-    # Salvar as credenciais e o tempo
-    credenciais = {"usuario": usuario_meli, "senha": senha_meli, "email": email_meli, "timestamp": datetime.datetime.now()}
-    with open("credenciais.pkl", "wb") as file:
-        pickle.dump(credenciais, file)
-
-    return credenciais
-
-''
-# looping para buscar e desativar usuário  no WMS.
-navegador1 = webdriver.Chrome()
-navegador1.get("https://envios.adminml.com/tools/auth/users/shared")
-button_ext = WebDriverWait(navegador1, 10).until(
-    EC.presence_of_element_located((By.ID, "teal-choice")))
-navegador1.execute_script("arguments[0].click();", button_ext)
-
-# Fazer login uma vez antes de entrar no loop
-login_wms = login_semanal()
-fazer_login_navegador(navegador1, login_wms["usuario"], login_wms["senha"])
-button_login = WebDriverWait(navegador1, 10).until(EC.presence_of_element_located((By.ID, "1-submit")))
-navegador1.execute_script("arguments[0].click();", button_login)
 
 {
     "bolhas": [
