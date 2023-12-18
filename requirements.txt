@@ -1,10 +1,10 @@
-streamlit==x.y.z
-gspread==x.y.z
-google-auth==x.y.z
-google-auth-oauthlib==x.y.z
-google-auth-httplib2==x.y.z
-google-api-python-client==x.y.z
-selenium==x.y.z
-webdriver-manager==x.y.z
-schedule==x.y.z
+streamlit==
+gspread==
+google-auth==
+google-auth-oauthlib==
+google-auth-httplib2==
+google-api-python-client==
+selenium==
+webdriver-manager==
+schedule==
 
