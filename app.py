@@ -26,11 +26,15 @@ import datetime
 import smtplib
 import email.message
 import datetime
-
+from streamlit.secrets import Secrets
 import os
 
 CLIENT_ID = os.environ.get("CLIENT_ID")
 CLIENT_SECRET = os.environ.get("CLIENT_SECRET")
+secrets = Secrets()
+SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
+HCsp06 = secrets["CLIENT_ID"]  # Substitua pelo nome correto em suas secrets
+pagina_HC_sp06 = secrets["CLIENT_SECRET"]  # Substitua pelo nome correto em suas secrets
 
 
 
@@ -237,10 +241,6 @@ CLIENT_SECRET = os.environ.get("CLIENT_SECRET")
     ]
 }
 
-SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
-
-HCsp06 = "1gP0vFS3GfSgVBiQncFECMxgWjENhVQN6TPUmPs_w78U"
-pagina_HC_sp06 = "BASE"
 
 def obter_credenciais():
     creds = None
@@ -268,10 +268,10 @@ def logar_HC(user_name):
     sheet = build('sheets', 'v4', credentials=creds)
 
     result = service.spreadsheets().values().get(spreadsheetId=HCsp06,
-                                                         range=pagina_HC_sp06).execute()
-    
+                                                 range=client).execute()
+
     values = result.get('values', [])
-    
+
     for i, row in enumerate(values):
         if row and row[7] == user_name:
             # Encontrou o usuário, retorna os valores das colunas N e S
