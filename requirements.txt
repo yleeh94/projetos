@@ -1,3 +1,10 @@
-streamlit==1.24.0 
-gspread==5.12.0 
-google-api-python-client==2.111.0
+streamlit==x.y.z
+gspread==x.y.z
+google-auth==x.y.z
+google-auth-oauthlib==x.y.z
+google-auth-httplib2==x.y.z
+google-api-python-client==x.y.z
+selenium==x.y.z
+webdriver-manager==x.y.z
+schedule==x.y.z
+
