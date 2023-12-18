@@ -26,7 +26,6 @@ import datetime
 import smtplib
 import email.message
 import datetime
-from streamlit.secrets import Secrets
 import os
 
 CLIENT_ID = os.environ.get("CLIENT_ID")
