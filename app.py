@@ -1,5 +1,4 @@
-import streamlit as st
-from streamlit.secrets import Secrets
+
 import json
 import gspread
 from google.auth.transport.requests import Request
@@ -26,10 +25,15 @@ import datetime
 import smtplib
 import email.message
 import datetime
-import os
+import streamlit as st
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
 
-CLIENT_ID = os.environ.get("CLIENT_ID")
-CLIENT_SECRET = os.environ.get("CLIENT_SECRET")
+secrets = st.secrets
+
+CLIENT_ID = secrets["CLIENT_ID"]
+CLIENT_SECRET = secrets["CLIENT_SECRET"]
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 
 
@@ -240,24 +244,17 @@ SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 
 def obter_credenciais():
     creds = None
-    if os.path.exists("token.json"):
-        creds = Credentials.from_authorized_user_file("token.json", SCOPES)
-
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            secrets = Secrets()
-            creds = Credentials.from_authorized_user_info(
-                {
-                    "client_id": secrets["CLIENT_ID"],
-                    "client_secret": secrets["CLIENT_SECRET"],
-                    "scopes": SCOPES
-                }
-            )
-
+    if st.file_uploader("token.json") == None:
+        st.warning("Arquivo de credencial não encontrado!")
+        flow = InstalledAppFlow.from_client_secrets_file(
+            "client_secret.json", SCOPES
+        )
+        creds = flow.run_local_server(port=0)
+        # Salvar as credenciais para uso posterior
         with open("token.json", "w") as token:
             token.write(creds.to_json())
+    else:
+        creds = Credentials.from_authorized_user_file("token.json", SCOPES)
 
     return creds
 def logar_HC(user_name):
