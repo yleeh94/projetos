@@ -6,6 +6,27 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+import os.path
+import time
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service as ChromeService
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import ElementClickInterceptedException
+from selenium.common.exceptions import TimeoutException
+import schedule
+import getpass
+import pickle
+import datetime
+import smtplib
+import email.message
+import datetime
+
 
 
 
@@ -267,6 +288,8 @@ def determinar_bolhas_disponiveis(coluna_n, coluna_s):
         return ["bolha7", "bolha8", "bolha9"]
     elif coluna_n in ["OPERADOR LOGÍSTICO 1", "OPERADOR LOGÍSTICO 2"] and coluna_s == "INBOUND":
         return ["bolha10", "bolha11", "bolha12"]
+    elif coluna_n in ["OPERADOR LOGÍSTICO 1", "OPERADOR LOGÍSTICO 2"] and coluna_s == "STAFF":
+        return ["bolha13", "bolha14", "bolha15"]
     else:
         return []
 
