@@ -1,4 +1,5 @@
 import streamlit as st
+from streamlit.secrets import Secrets
 import json
 import gspread
 from google.auth.transport.requests import Request
@@ -246,18 +247,19 @@ def obter_credenciais():
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-
+            secrets = Secrets()
             creds = Credentials.from_authorized_user_info(
-                client_id=CLIENT_ID,
-                client_secret=CLIENT_SECRET,
-                scopes=SCOPES
+                {
+                    "client_id": secrets["CLIENT_ID"],
+                    "client_secret": secrets["CLIENT_SECRET"],
+                    "scopes": SCOPES
+                }
             )
 
         with open("token.json", "w") as token:
             token.write(creds.to_json())
 
     return creds
-
 def logar_HC(user_name):
     creds = obter_credenciais()
     service = build("sheets", "v4", credentials=creds)
