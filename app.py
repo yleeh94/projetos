@@ -247,9 +247,9 @@ def obter_credenciais():
     {
         "client_id": secrets["CLIENT_ID"],
         "client_secret": secrets["CLIENT_SECRET"],
-        "scopes": SCOPES
-        
-        return creds
+        "scopes": SCOPES})
+    
+    return creds
 
 def logar_HC(user_name):
     creds = obter_credenciais()
