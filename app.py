@@ -30,7 +30,6 @@ import os
 
 CLIENT_ID = os.environ.get("CLIENT_ID")
 CLIENT_SECRET = os.environ.get("CLIENT_SECRET")
-secrets = Secrets()
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 HCsp06 = secrets["CLIENT_ID"]  # Substitua pelo nome correto em suas secrets
 pagina_HC_sp06 = secrets["CLIENT_SECRET"]  # Substitua pelo nome correto em suas secrets
