@@ -1,6 +1,5 @@
 import streamlit as st
 import json
-from google.oauth2 import service_account
 import gspread
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -9,17 +8,6 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 import os.path
 import time
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service as ChromeService
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.keys import Keys
-from selenium.common.exceptions import NoSuchElementException
-from selenium.common.exceptions import ElementClickInterceptedException
-from selenium.common.exceptions import TimeoutException
 import schedule
 import getpass
 import pickle
