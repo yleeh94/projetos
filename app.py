@@ -243,16 +243,11 @@ SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 
 
 def obter_credenciais():
-    creds = None
-    if st.file_uploader("token.json") is None:
-        st.warning("Arquivo de credencial não encontrado!")
-        flow = InstalledAppFlow.from_client_secrets_file("client_secret.json", SCOPES)
-        creds = flow.run_local_server(port=0)
-        # Salvar as credenciais para uso posterior
-        with open("token.json", "w") as token:
-            token.write(creds.to_json())
-    else:
-        creds = Credentials.from_authorized_user_file("token.json", SCOPES)
+    creds = Credentials.from_authorized_user_info(
+    {
+        "client_id": secrets["CLIENT_ID"],
+        "client_secret": secrets["CLIENT_SECRET"],
+        "scopes": SCOPES
 
     return creds
 
