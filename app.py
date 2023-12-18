@@ -27,6 +27,10 @@ import smtplib
 import email.message
 import datetime
 
+import os
+
+CLIENT_ID = os.environ.get("CLIENT_ID")
+CLIENT_SECRET = os.environ.get("CLIENT_SECRET")
 
 
 
@@ -247,13 +251,17 @@ def obter_credenciais():
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file("client_secret.json", SCOPES)
-            creds = flow.run_local_server(port=0)
+            creds = Credentials.from_authorized_user_info(
+                client_id=os.getenv('CLIENT_ID'),
+                client_secret=os.getenv('CLIENT_SECRET'),
+                scopes=SCOPES
+            )
+
         with open("token.json", "w") as token:
             token.write(creds.to_json())
-    
 
     return creds
+
 def logar_HC(user_name):
     creds = obter_credenciais()
     service = build("sheets", "v4", credentials=creds)
