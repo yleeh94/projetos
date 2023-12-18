@@ -2,7 +2,6 @@ import streamlit as st
 import json
 import gspread
 from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
@@ -31,8 +30,6 @@ import os
 CLIENT_ID = os.environ.get("CLIENT_ID")
 CLIENT_SECRET = os.environ.get("CLIENT_SECRET")
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
-HCsp06 = secrets["CLIENT_ID"]  # Substitua pelo nome correto em suas secrets
-pagina_HC_sp06 = secrets["CLIENT_SECRET"]  # Substitua pelo nome correto em suas secrets
 
 
 
@@ -249,9 +246,10 @@ def obter_credenciais():
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
+
             creds = Credentials.from_authorized_user_info(
-                client_id=os.getenv('CLIENT_ID'),
-                client_secret=os.getenv('CLIENT_SECRET'),
+                client_id=CLIENT_ID,
+                client_secret=CLIENT_SECRET,
                 scopes=SCOPES
             )
 
@@ -265,8 +263,8 @@ def logar_HC(user_name):
     service = build("sheets", "v4", credentials=creds)
     sheet = build('sheets', 'v4', credentials=creds)
 
-    result = service.spreadsheets().values().get(spreadsheetId=HCsp06,
-                                                 range=client).execute()
+    # Substitua 'client' pela variável correta
+    result = service.spreadsheets().values().get(spreadsheetId='1gP0vFS3GfSgVBiQncFECMxgWjENhVQN6TPUmPs_w78U', range="BASE").execute()
 
     values = result.get('values', [])
 
@@ -283,7 +281,6 @@ def logar_HC(user_name):
 def buscar_informacoes(user_name):
     coluna_n, coluna_s = logar_HC(user_name)
     return coluna_n, coluna_s
-
 
 def determinar_bolhas_disponiveis(coluna_n, coluna_s):
     if coluna_n in ["REP DE ENVIO 1", "REP DE ENVIO 2", "REP DE ENVIO 3"] and coluna_s == "outbound":
