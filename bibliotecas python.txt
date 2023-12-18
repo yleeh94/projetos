@@ -1,0 +1,7 @@
+pip install -r requirements.txt
+pip install schedule
+pip install webdriver-manager
+pip install selenium
+pip install google-api-python-client
+pip install google-auth-oauthlib
+pip install google-auth gspread
