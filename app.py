@@ -1,10 +1,5 @@
-import streamlit as st
 import json
 import gspread
-from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
-from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 import os.path
 import time
@@ -25,6 +20,12 @@ import datetime
 import smtplib
 import email.message
 import datetime
+import os
+import streamlit as st
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from googleapiclient.discovery import build
 
 
 
@@ -237,22 +238,23 @@ SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 HCsp06 = "1gP0vFS3GfSgVBiQncFECMxgWjENhVQN6TPUmPs_w78U"
 pagina_HC_sp06 = "BASE"
 
-def obter_credenciais():
-    creds = None
-    if os.path.exists("token.json"):
-        creds = Credentials.from_authorized_user_file("token.json", SCOPES)
+from google.oauth2 import service_account
 
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file("client_secret.json", SCOPES)
-            creds = flow.run_local_server(port=0)
-        with open("token.json", "w") as token:
-            token.write(creds.to_json())
-    
+def obter_credenciais():
+    credenciais = {
+        "type": "service_account",
+        "project_id": "solid-saga-405209",
+        "client_id": "363396776472-7glp8gpfetg4325pdr9a2ihshsrfh3qs.apps.googleusercontent.com",
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://oauth2.googleapis.com/token",
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "client_x509_cert_url": f"https://www.googleapis.com/robot/v1/metadata/x509/{SEU_CLIENT_EMAIL}%40solid-saga-405209.iam.gserviceaccount.com",
+    }
+
+    creds = service_account.Credentials.from_service_account_info(credenciais, scopes=["https://www.googleapis.com/auth/spreadsheets"])
 
     return creds
+    
 def logar_HC(user_name):
     creds = obter_credenciais()
     service = build("sheets", "v4", credentials=creds)
