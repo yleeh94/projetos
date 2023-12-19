@@ -1,7 +1,8 @@
-
+import streamlit as st
 import json
 import gspread
 from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
@@ -9,7 +10,6 @@ import os.path
 import time
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
-from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.by import By
@@ -25,10 +25,7 @@ import datetime
 import smtplib
 import email.message
 import datetime
-import streamlit as st
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
-from googleapiclient.discovery import build
+
 
 
 
@@ -235,41 +232,38 @@ from googleapiclient.discovery import build
     ]
 }
 
-secrets = st.secrets["secrets"]
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 
+HCsp06 = "1gP0vFS3GfSgVBiQncFECMxgWjENhVQN6TPUmPs_w78U"
+pagina_HC_sp06 = "BASE"
+
 def obter_credenciais():
-    creds = st.session_state.creds if "creds" in st.session_state else None
+    creds = None
+    if os.path.exists("token.json"):
+        creds = Credentials.from_authorized_user_file("token.json", SCOPES)
 
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            creds = obter_credenciais_interativo()
-
-        st.session_state.creds = creds
+            flow = InstalledAppFlow.from_client_secrets_file("client_secret.json", SCOPES)
+            creds = flow.run_local_server(port=0)
+        with open("token.json", "w") as token:
+            token.write(creds.to_json())
+    
 
     return creds
-
-def obter_credenciais_interativo():
-    flow = InstalledAppFlow.from_client_secrets_file(
-        "client_secret.json", SCOPES
-    )
-    creds = flow.run_local_server(port=0)
-    return creds
-
 def logar_HC(user_name):
     creds = obter_credenciais()
     service = build("sheets", "v4", credentials=creds)
+    sheet = build('sheets', 'v4', credentials=creds)
 
-    spreadsheet_id = '1gP0vFS3GfSgVBiQncFECMxgWjENhVQN6TPUmPs_w78U'
-    range_name = "BASE"
+    result = service.spreadsheets().values().get(spreadsheetId=HCsp06,
+                                                         range=pagina_HC_sp06).execute()
     
-    result = service.spreadsheets().values().get(spreadsheetId=spreadsheet_id, range=range_name).execute()
-
     values = result.get('values', [])
-
-    for _, row in enumerate(values):
+    
+    for i, row in enumerate(values):
         if row and row[7] == user_name:
             # Encontrou o usuário, retorna os valores das colunas N e S
             coluna_n = row[13] if len(row) > 13 else None
@@ -279,9 +273,71 @@ def logar_HC(user_name):
     # Usuário não encontrado
     return None, None
 
-if __name__ == "__main__":
-    user_name = st.text_input("Digite o nome do usuário:")
+def buscar_informacoes(user_name):
+    coluna_n, coluna_s = logar_HC(user_name)
+    return coluna_n, coluna_s
+
+
+def determinar_bolhas_disponiveis(coluna_n, coluna_s):
+    if coluna_n in ["REP DE ENVIO 1", "REP DE ENVIO 2", "REP DE ENVIO 3"] and coluna_s == "outbound":
+        return ["bolha1", "bolha2", "bolha3"]
+    elif coluna_n in ["OPERADOR LOGÍSTICO 1", "OPERADOR LOGÍSTICO 2"] and coluna_s == "outbound":
+        return ["bolha3", "bolha4", "bolha6"]
+    elif coluna_n in ["REP DE ENVIO 1", "REP DE ENVIO 2", "REP DE ENVIO 3"] and coluna_s == "INBOUND":
+        return ["bolha7", "bolha8", "bolha9"]
+    elif coluna_n in ["OPERADOR LOGÍSTICO 1", "OPERADOR LOGÍSTICO 2"] and coluna_s == "INBOUND":
+        return ["bolha10", "bolha11", "bolha12"]
+    elif coluna_n in ["OPERADOR LOGÍSTICO 1", "OPERADOR LOGÍSTICO 2"] and coluna_s == "STAFF":
+        return ["bolha13", "bolha14", "bolha15"]
+    else:
+        return []
+
+
+def buscar():
+    user_name = st.text_input("Insira o usuário")
     if st.button("Buscar Informações"):
-        coluna_n, coluna_s = buscar_informacoes(user_name)
-        st.write(f"Coluna N: {coluna_n}")
-        st.write(f"Coluna S: {coluna_s}")
+        if user_name:
+            coluna_n, coluna_s = buscar_informacoes(user_name)
+            
+            if coluna_n is not None and coluna_s is not None:
+                st.success(f"Informações encontradas para {user_name}: Coluna N: {coluna_n}, Coluna S: {coluna_s}")
+
+
+
+
+                if tipo_alteracao == "gestao":
+                    alterar_gestao(coluna_n, coluna_s)
+                
+                elif tipo_alteracao == "bolha":
+                    alterar_bolha(coluna_n, coluna_s)
+                
+                elif tipo_alteracao == "processo madre":
+                    alterar_processo_madre()
+
+            else:
+                st.warning(f"Usuário {user_name} não encontrado na planilha.")
+        else:
+            st.warning("Por favor, insira o nome do usuário para buscar.")
+
+def alterar_gestao(coluna_n, coluna_s):
+    nome_gestor = st.text_input("Nome do gestor:", key="gestor_input")
+    st.success(f"Alteração de gestão para {nome_gestor} realizada com sucesso.")
+
+def alterar_bolha(coluna_n, coluna_s):
+    bolhas_disponiveis = determinar_bolhas_disponiveis(coluna_n, coluna_s)
+    if bolhas_disponiveis:
+        escolha_bolha = st.selectbox("Escolha a bolha:", bolhas_disponiveis, key="bolha_input")
+        st.success(f"Bolha {escolha_bolha} adicionada com sucesso.")
+    else:
+        st.warning("Não há bolhas disponíveis para seleção.")
+
+def alterar_processo_madre():
+    processo_madre = st.text_input("Qual processo?", key="processo_input")
+    st.success(f"Alteração de processo madre para {processo_madre} realizada com sucesso.")
+
+
+
+
+if __name__ == "__main__":
+    tipo_alteracao = st.radio("Qual tipo de alteração?", ["gestao", "bolha", "processo madre"])
+    buscar()
