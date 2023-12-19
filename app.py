@@ -1,5 +1,6 @@
 import json
 import gspread
+from google.oauth2 import service_account
 from googleapiclient.errors import HttpError
 import os.path
 import time
@@ -238,22 +239,24 @@ SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 HCsp06 = "1gP0vFS3GfSgVBiQncFECMxgWjENhVQN6TPUmPs_w78U"
 pagina_HC_sp06 = "BASE"
 
-from google.oauth2 import service_account
 
 def obter_credenciais():
+    # Substitua as informações abaixo pelos valores do seu arquivo client_secret.json
     credenciais = {
-        "type": "service_account",
-        "project_id": "solid-saga-405209",
-        "client_id": "363396776472-7glp8gpfetg4325pdr9a2ihshsrfh3qs.apps.googleusercontent.com",
-        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-        "token_uri": "https://oauth2.googleapis.com/token",
-        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-        "client_x509_cert_url": f"https://www.googleapis.com/robot/v1/metadata/x509/{SEU_CLIENT_EMAIL}%40solid-saga-405209.iam.gserviceaccount.com",
+        "installed": {
+            "client_id": "363396776472-7glp8gpfetg4325pdr9a2ihshsrfh3qs.apps.googleusercontent.com",
+            "project_id": "solid-saga-405209",
+            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+            "token_uri": "https://oauth2.googleapis.com/token",
+            "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+            "client_secret": "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",
+            "redirect_uris": ["http://localhost"]
+        }
     }
 
     creds = service_account.Credentials.from_service_account_info(credenciais, scopes=["https://www.googleapis.com/auth/spreadsheets"])
-
     return creds
+
     
 def logar_HC(user_name):
     creds = obter_credenciais()
