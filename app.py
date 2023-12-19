@@ -287,66 +287,10 @@ def buscar_informacoes(user_name):
     coluna_n, coluna_s = logar_HC(user_name)
     return coluna_n, coluna_s
 
-def determinar_bolhas_disponiveis(coluna_n, coluna_s):
-    if coluna_n in ["REP DE ENVIO 1", "REP DE ENVIO 2", "REP DE ENVIO 3"] and coluna_s == "outbound":
-        return ["bolha1", "bolha2", "bolha3"]
-    elif coluna_n in ["OPERADOR LOGÍSTICO 1", "OPERADOR LOGÍSTICO 2"] and coluna_s == "outbound":
-        return ["bolha3", "bolha4", "bolha6"]
-    elif coluna_n in ["REP DE ENVIO 1", "REP DE ENVIO 2", "REP DE ENVIO 3"] and coluna_s == "INBOUND":
-        return ["bolha7", "bolha8", "bolha9"]
-    elif coluna_n in ["OPERADOR LOGÍSTICO 1", "OPERADOR LOGÍSTICO 2"] and coluna_s == "INBOUND":
-        return ["bolha10", "bolha11", "bolha12"]
-    elif coluna_n in ["OPERADOR LOGÍSTICO 1", "OPERADOR LOGÍSTICO 2"] and coluna_s == "STAFF":
-        return ["bolha13", "bolha14", "bolha15"]
-    else:
-        return []
 
-
-def buscar():
-    user_name = st.text_input("Insira o usuário")
-    if st.button("Buscar Informações"):
-        if user_name:
-            coluna_n, coluna_s = buscar_informacoes(user_name)
-            
-            if coluna_n is not None and coluna_s is not None:
-                st.success(f"Informações encontradas para {user_name}: Coluna N: {coluna_n}, Coluna S: {coluna_s}")
-
-
-
-
-                if tipo_alteracao == "gestao":
-                    alterar_gestao(coluna_n, coluna_s)
-                
-                elif tipo_alteracao == "bolha":
-                    alterar_bolha(coluna_n, coluna_s)
-                
-                elif tipo_alteracao == "processo madre":
-                    alterar_processo_madre()
-
-            else:
-                st.warning(f"Usuário {user_name} não encontrado na planilha.")
-        else:
-            st.warning("Por favor, insira o nome do usuário para buscar.")
-
-def alterar_gestao(coluna_n, coluna_s):
-    nome_gestor = st.text_input("Nome do gestor:", key="gestor_input")
-    st.success(f"Alteração de gestão para {nome_gestor} realizada com sucesso.")
-
-def alterar_bolha(coluna_n, coluna_s):
-    bolhas_disponiveis = determinar_bolhas_disponiveis(coluna_n, coluna_s)
-    if bolhas_disponiveis:
-        escolha_bolha = st.selectbox("Escolha a bolha:", bolhas_disponiveis, key="bolha_input")
-        st.success(f"Bolha {escolha_bolha} adicionada com sucesso.")
-    else:
-        st.warning("Não há bolhas disponíveis para seleção.")
-
-def alterar_processo_madre():
-    processo_madre = st.text_input("Qual processo?", key="processo_input")
-    st.success(f"Alteração de processo madre para {processo_madre} realizada com sucesso.")
 
 
 
 
 if __name__ == "__main__":
-    tipo_alteracao = st.radio("Qual tipo de alteração?", ["gestao", "bolha", "processo madre"])
-    buscar()
+    buscar_informacoes(user_name)
