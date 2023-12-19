@@ -30,12 +30,6 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 
-secrets = st.secrets["secrets"]
-
-CLIENT_ID = secrets["CLIENT_ID"]
-CLIENT_SECRET = secrets["CLIENT_SECRET"]
-SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
-
 
 
 {
@@ -241,7 +235,8 @@ SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
     ]
 }
 
-
+secrets = st.secrets["secrets"]
+SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 
 def obter_credenciais():
     creds = st.session_state.creds if "creds" in st.session_state else None
@@ -263,17 +258,18 @@ def obter_credenciais_interativo():
     creds = flow.run_local_server(port=0)
     return creds
 
-
 def logar_HC(user_name):
     creds = obter_credenciais()
     service = build("sheets", "v4", credentials=creds)
 
-    # Substitua 'client' pela variável correta
-    result = service.spreadsheets().values().get(spreadsheetId='1gP0vFS3GfSgVBiQncFECMxgWjENhVQN6TPUmPs_w78U', range="BASE").execute()
+    spreadsheet_id = '1gP0vFS3GfSgVBiQncFECMxgWjENhVQN6TPUmPs_w78U'
+    range_name = "BASE"
+    
+    result = service.spreadsheets().values().get(spreadsheetId=spreadsheet_id, range=range_name).execute()
 
     values = result.get('values', [])
 
-    for i, row in enumerate(values):
+    for _, row in enumerate(values):
         if row and row[7] == user_name:
             # Encontrou o usuário, retorna os valores das colunas N e S
             coluna_n = row[13] if len(row) > 13 else None
@@ -283,14 +279,9 @@ def logar_HC(user_name):
     # Usuário não encontrado
     return None, None
 
-def buscar_informacoes(user_name):
-    coluna_n, coluna_s = logar_HC(user_name)
-    return coluna_n, coluna_s
-
-
-
-
-
-
 if __name__ == "__main__":
-    buscar_informacoes(user_name)
+    user_name = st.text_input("Digite o nome do usuário:")
+    if st.button("Buscar Informações"):
+        coluna_n, coluna_s = buscar_informacoes(user_name)
+        st.write(f"Coluna N: {coluna_n}")
+        st.write(f"Coluna S: {coluna_s}")
